@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>html5 FileReader 图片上传</title>
+<link rel="stylesheet" href="http://cdn.loveqiao.com/buttons.css">
+<style>
+.uploadBox{ width:600px; border:solid 1px #ddd; margin:0 auto;}
+.button{ width:200px; position:relative; margin:10px auto 20px; display:block;}
+.button input{ width:100%; height:100%; opacity:0; position:absolute; left:0; top:0;}
+.imgList{ min-height:200px; background:#f5f5f5; overflow:hidden; border-bottom:solid 1px #ddd; position:relative;}
+.imgList:after{ content:'HTML5图片上传--老徐'; position:absolute;left:0; top:0; width:100%; text-align:center; line-height:200px; font:26px/200px '微软雅黑'; color:#ccc; z-index:0;}
+.imgList .item{ float:left; width:200px; height:200px; position:relative; z-index:1;}
+.imgList .loading{ width:80%; height:20px; background:#f5f5f5; box-shadow:1px 1px 2px #ccc inset; opacity:.8; border-radius:5px; overflow:hidden; position:absolute; top:50%; left:10%; margin-top:-10px; z-index:1;}
+.imgList .loading span{ display:block; width:70%; height:100%; background:#090; animation:animate ease 1s;-webkit-animation:animate ease 1s; transition:all ease 1s;-webkit-transition:all ease 1s;}
+.imgList .child{ transition:all ease .5s;-webkit-transition:all ease .5s;}
+.imgList .child .shadow{ position:absolute; left:0; top:0; width:100%; height:100%; background:#000; opacity:.2; z-index:0;}
+@keyframes animate{
+	from{ width:0;}
+	to{ width:70%}
+}
+@-webkit-keyframes animate{
+	from{ width:0;}
+	to{ width:70%}
+}
+.imgList img{ width:100%; height:100%;}
+</style>
+
+</head>
+<body>
+<div class="uploadBox">
+	<div id="imgList" class="imgList"></div>
+	<div class="button button-3d button-primary button-rounded">
+		点击上传
+		<input type="file" name="file" onchange="showPreview(this)" multiple accept="image/*" />
+	</div>
+</div>
+<script type="text/javascript">
+/*
+ @ name：html5 图片上传
+ @ author：前端老徐
+ @ time：2015/6/23
+ @ e-mail：442413729@qq.com
+ @ weibo:http://weibo.com/qdlaoxu
+ @ address:http://www.loveqiao.com/
+*/
+function showPreview(source) {
+	var fileList = source.files;
+	//console.log(source.files)
+	if(window.FileReader) {
+		for(var i=0;i<fileList.length;i++){
+			(function(i){
+				var fr = new FileReader();
+				fr.onloadend = function(e) {
+					//console.log(/image\/\w+/.test(file.type))
+					var img=new Image
+					img.src=this.result;
+					img.onload=function(){
+						//创建html
+						var para=document.createElement('div'),
+							node=document.createElement('div');
+						para.className='item';
+						node.className='child';
+						node.innerHTML="<div class='loading'><span></span></div><div class='shadow'></div>";
+						para.appendChild(node);
+						para.appendChild(img);
+						document.getElementById('imgList').appendChild(para);
+						
+						//模拟ajax上传
+						setTimeout(function(){
+							node.getElementsByTagName('div')[0].getElementsByTagName('span')[0].style.width='100%';
+							setTimeout(function(){
+								node.style.opacity='0';
+							},1000)
+						},1200);
+					}
+				};
+				fr.readAsDataURL(fileList[i]);	
+			})(i)	
+		}
+	}
+}
+</script>
+</body>
+</html>
