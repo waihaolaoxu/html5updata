@@ -3,38 +3,46 @@
 <head>
 <meta charset="utf-8">
 <title>html5 FileReader 图片上传</title>
+<link rel="stylesheet" href="http://www.loveqiao.com/css/public.css">
 <link rel="stylesheet" href="http://cdn.loveqiao.com/buttons.css">
 <style>
-.uploadBox{ width:600px; border:solid 1px #ddd; margin:0 auto;}
-.button{ width:200px; position:relative; margin:10px auto 20px; display:block;}
-.button input{ width:100%; height:100%; opacity:0; position:absolute; left:0; top:0;}
-.imgList{ min-height:200px; background:#f5f5f5; overflow:hidden; border-bottom:solid 1px #ddd; position:relative;}
-.imgList:after{ content:'HTML5图片上传--老徐'; position:absolute;left:0; top:0; width:100%; text-align:center; line-height:200px; font:26px/200px '微软雅黑'; color:#ccc; z-index:0;}
-.imgList .item{ float:left; width:200px; height:200px; position:relative; z-index:1;}
-.imgList .loading{ width:80%; height:20px; background:#f5f5f5; box-shadow:1px 1px 2px #ccc inset; opacity:.8; border-radius:5px; overflow:hidden; position:absolute; top:50%; left:10%; margin-top:-10px; z-index:1;}
-.imgList .loading span{ display:block; width:70%; height:100%; background:#090; animation:animate ease 1s;-webkit-animation:animate ease 1s; transition:all ease 1s;-webkit-transition:all ease 1s;}
-.imgList .child{ transition:all ease .5s;-webkit-transition:all ease .5s;}
-.imgList .child .shadow{ position:absolute; left:0; top:0; width:100%; height:100%; background:#000; opacity:.2; z-index:0;}
-@keyframes animate{
-	from{ width:0;}
-	to{ width:70%}
+.uploadBox { width: 600px; border: solid 1px #ddd; margin: 0 auto; }
+.button { width: 200px; position: relative; margin: 10px auto 20px; display: block; }
+.button input { width: 100%; height: 100%; opacity: 0; position: absolute; left: 0; top: 0; }
+.imgList { min-height: 200px; background: #f5f5f5; overflow: hidden; border-bottom: solid 1px #ddd; position: relative; }
+.imgList:after { content: 'HTML5图片上传--老徐'; position: absolute; left: 0; top: 0; width: 100%; text-align: center; line-height: 200px; font: 26px/200px '微软雅黑'; color: #ccc; z-index: 0; }
+.imgList .bar{ height:25px; line-height:25px; background:rgba(0,0,0,.5); position:absolute; top:0; left:0; width:100%; text-align:right; color:#fff; display:none; z-index:2;}
+.imgList .item:hover .bar{ display:block;}
+.imgList .bar span{ padding:0 10px; cursor:pointer; -moz-user-select:none;}
+.imgList .error { background: rgba(255, 0, 0, 0.5); bottom: 0; color: #fff; padding: 5px 10px; position: absolute; z-index: 1; }
+.imgList .item { float: left; width: 200px; height: 200px; overflow:hidden; position: relative; z-index: 1;}
+.imgList .item img{ transition:all .3s;-webkit-transition:all .5s;}
+.imgList .loading { width: 80%; height: 20px; background: #f5f5f5; box-shadow: 1px 1px 2px #ccc inset; opacity: .8; border-radius: 5px; overflow: hidden; position: absolute; top: 50%; left: 10%; margin-top: -10px; z-index: 1; }
+.imgList .loading span { display: block; width: 70%; height: 100%; background: #090; animation: animate ease 1s; -webkit-animation: animate ease 1s; transition: all ease 1s; -webkit-transition: all ease 1s; }
+.imgList .child { transition: all ease .5s; -webkit-transition: all ease .5s; }
+.imgList .child .shadow { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #000; opacity: .2; z-index: 0; }
+@keyframes animate {  from {
+width:0;
 }
-@-webkit-keyframes animate{
-	from{ width:0;}
-	to{ width:70%}
+to { width: 70% }
 }
-.imgList img{ width:100%; height:100%;}
+@-webkit-keyframes animate {  from {
+width:0;
+}
+to { width: 70% }
+}
+.imgList img { width: 100%; height: 100%; }
 </style>
-
 </head>
 <body>
 <div class="uploadBox">
 	<div id="imgList" class="imgList"></div>
-	<div class="button button-3d button-primary button-rounded">
-		点击上传
+	<div class="button button-3d button-primary button-rounded"> 点击上传
 		<input type="file" name="file" onchange="showPreview(this)" multiple accept="image/*" />
 	</div>
 </div>
+<p align="center" style="padding:20px 0">相关案例：<a style="color:#0066bc" target="_blank" href="dragupdata.html">拖拽上传实例</a></p>
+<script src="http://cdn.loveqiao.com/jquery.js"></script>
 <script type="text/javascript">
 /*
  @ name：html5 图片上传
@@ -45,41 +53,66 @@
  @ address:http://www.loveqiao.com/
 */
 function showPreview(source) {
-	var fileList = source.files;
-	//console.log(source.files)
 	if(window.FileReader) {
+		var fileList = source.files;
+		//console.log(fileList)
 		for(var i=0;i<fileList.length;i++){
 			(function(i){
+				var file=fileList[i];
+				if(!/image\/\w+/.test(file.type)){
+					alert('您选择的'+file.name+'不是图片');
+					return
+				}
 				var fr = new FileReader();
 				fr.onloadend = function(e) {
-					//console.log(/image\/\w+/.test(file.type))
 					var img=new Image
 					img.src=this.result;
 					img.onload=function(){
 						//创建html
-						var para=document.createElement('div'),
-							node=document.createElement('div');
-						para.className='item';
-						node.className='child';
-						node.innerHTML="<div class='loading'><span></span></div><div class='shadow'></div>";
+						var para=document.createElement('div');
+							para.className='item';
+						var node=document.createElement('div');
+							node.className='child';
+						var bar=document.createElement('div');
+							bar.className='bar';
+							bar.innerHTML="<div class='bar'><span class='rotate'>旋转</span><span class='del'>删除</span></div>";
+						if(file.size>512000){
+							node.innerHTML="<div class='error'>图片上传失败，上传图片不能大于500kb</div><div class='shadow'></div>";
+						}else{
+							node.innerHTML="<div class='loading'><span></span></div><div class='shadow'></div>";
+						}
 						para.appendChild(node);
+						para.appendChild(bar);
 						para.appendChild(img);
 						document.getElementById('imgList').appendChild(para);
-						
+						//删除功能
+						$(bar).find('.del').click(function(){
+							$(this).parents('.item').remove();	
+						});
+						//旋转功能
+						var deg=0;
+						$(bar).find('.rotate').click(function(){
+							$(this).parents('.item').find('img').css('transform','rotate('+(deg+=90)+'deg)');	
+						});
 						//模拟ajax上传
-						setTimeout(function(){
-							node.getElementsByTagName('div')[0].getElementsByTagName('span')[0].style.width='100%';
+						if(file.size<=512000){
 							setTimeout(function(){
-								node.style.opacity='0';
-							},1000)
-						},1200);
+								node.getElementsByTagName('div')[0].getElementsByTagName('span')[0].style.width='100%';
+								setTimeout(function(){
+									node.style.opacity='0';
+								},1000)
+							},1200);
+						}
 					}
 				};
-				fr.readAsDataURL(fileList[i]);	
+				fr.readAsDataURL(file);	
 			})(i)	
 		}
+	}else{
+		alert('您的浏览器不支持FileReader')	
 	}
 }
-</script>
+</script> 
+<script src="http://www.loveqiao.com/js/public.js"></script>
 </body>
 </html>
